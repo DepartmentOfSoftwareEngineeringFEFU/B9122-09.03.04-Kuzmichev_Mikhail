@@ -1,0 +1,110 @@
+<section class="test-page">
+  <div class="test-page__actions">
+    @if (test()?.module_id; as moduleId) {
+      <a class="test-page__link" [routerLink]="['/modules', moduleId]">К модулю</a>
+    } @else {
+      <button class="test-page__back" type="button" (click)="goBack()">Вернуться назад</button>
+    }
+  </div>
+
+  @if (errorMessage()) {
+    <div class="test-state test-state--error" role="alert">{{ errorMessage() }}</div>
+  }
+
+  @if (isLoading()) {
+    <div class="test-state">Загрузка теста...</div>
+  } @else if (test(); as currentTest) {
+    <article class="test-card">
+      <span class="test-card__badge">Тест</span>
+      <h1>{{ currentTest.title }}</h1>
+      <p>{{ currentTest.description || 'Описание теста будет добавлено позже.' }}</p>
+
+      <div class="test-card__grid">
+        <div>
+          <span>Лимит времени</span>
+          <strong>{{ currentTest.time_limit ? currentTest.time_limit + ' мин.' : 'Без лимита' }}</strong>
+        </div>
+        <div>
+          <span>Проходной процент</span>
+          <strong>{{ currentTest.passing_score | number: '1.0-0' }}%</strong>
+        </div>
+        <div>
+          <span>Доступные попытки</span>
+          <strong>{{ currentTest.attempts_allowed }}</strong>
+        </div>
+        <div>
+          <span>Статус</span>
+          <strong>{{ currentTest.is_active ? 'Активен' : 'Неактивен' }}</strong>
+        </div>
+      </div>
+
+      @if (analytics(); as testAnalytics) {
+        <div class="test-card__grid">
+          <div>
+            <span>Попытки</span>
+            <strong>{{ testAnalytics.attempts_count }}</strong>
+          </div>
+          <div>
+            <span>Завершено</span>
+            <strong>{{ testAnalytics.completed_attempts_count }}</strong>
+          </div>
+          <div>
+            <span>Незавершено</span>
+            <strong>{{ testAnalytics.unfinished_attempts_count }}</strong>
+          </div>
+          <div>
+            <span>Тренд</span>
+            <strong>{{ testAnalytics.overall_trend }}</strong>
+          </div>
+          <div>
+            <span>Первая попытка</span>
+            <strong>{{ testAnalytics.first_result | number: '1.0-0' }}%</strong>
+          </div>
+          <div>
+            <span>Последняя попытка</span>
+            <strong>{{ testAnalytics.last_result | number: '1.0-0' }}%</strong>
+          </div>
+          <div>
+            <span>Прирост</span>
+            <strong>{{ testAnalytics.progress_delta | number: '1.0-0' }} п.п.</strong>
+          </div>
+          <div>
+            <span>Серия неудач</span>
+            <strong>{{ testAnalytics.failure_streak }}</strong>
+          </div>
+        </div>
+
+        @if (testAnalytics.insight) {
+          <div class="test-card__resume-note">
+            {{ testAnalytics.insight }}
+          </div>
+        }
+      }
+
+      @if (activeAttempt()) {
+        <div class="test-card__resume-note">
+          У вас уже есть незавершённая попытка. Сначала продолжите или завершите её, после этого можно будет начать новую.
+        </div>
+      }
+
+      @if (attemptsExhausted()) {
+        <div class="test-card__warning">Попытки исчерпаны. Начать тест повторно нельзя.</div>
+      }
+
+      <div class="test-card__resume-actions">
+        @if (activeAttempt()) {
+          <a class="test-card__secondary" routerLink="/attempts">Все незавершённые попытки</a>
+        }
+
+        <button
+          class="test-card__start"
+          type="button"
+          [disabled]="!currentTest.is_active || attemptsExhausted() || isStarting()"
+          (click)="startTest()"
+        >
+          {{ isStarting() ? (activeAttempt() ? 'Открываем...' : 'Запуск...') : startButtonLabel() }}
+        </button>
+      </div>
+    </article>
+  }
+</section>

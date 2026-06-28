@@ -1,0 +1,67 @@
+<section class="courses-page">
+  <article class="courses-hero">
+    <span class="courses-hero__badge">Курсы</span>
+    <h1>Выберите маршрут обучения и переходите к занятиям в удобном ритме.</h1>
+    <p>
+      Открытые курсы можно начать сразу, а для закрытых программ доступ назначает преподаватель или администратор.
+    </p>
+  </article>
+
+  @if (errorMessage()) {
+    <div class="page-state page-state--error" role="alert">
+      {{ errorMessage() }}
+    </div>
+  }
+
+  @if (infoMessage()) {
+    <div class="page-state page-state--info">
+      {{ infoMessage() }}
+    </div>
+  }
+
+  @if (isLoading()) {
+    <div class="page-state">Загрузка курсов...</div>
+  } @else if (!courses().length) {
+    <div class="page-state page-state--empty">
+      Пока нет опубликованных курсов. Как только они появятся, список отобразится здесь.
+    </div>
+  } @else {
+    <section class="courses-grid">
+      @for (course of courses(); track trackByCourseId($index, course)) {
+        <article class="course-card">
+          <div class="course-card__header">
+            <span class="course-card__difficulty">Сложность {{ difficultyLabel(course) }}</span>
+            <span class="course-card__status" [class.course-card__status--closed]="!course.is_open">
+              {{ statusLabel(course) }}
+            </span>
+          </div>
+
+          <h2>{{ course.title }}</h2>
+          <p>{{ course.description || 'Описание курса будет добавлено позже.' }}</p>
+
+          <div class="course-card__progress">
+            <span>Доступ</span>
+            <strong>{{ progressHint(course) }}</strong>
+          </div>
+
+          <div class="course-card__actions">
+            <button
+              class="course-card__button"
+              type="button"
+              [disabled]="isEnrolling()[course.id]"
+              (click)="startCourse(course)"
+            >
+              {{ isEnrolling()[course.id] ? 'Подключаем...' : actionLabel(course) }}
+            </button>
+
+            @if (isPrivilegedUser() && !course.is_open) {
+              <button class="course-card__secondary" type="button" (click)="openManagement(course.id)">
+                Управление доступом
+              </button>
+            }
+          </div>
+        </article>
+      }
+    </section>
+  }
+</section>

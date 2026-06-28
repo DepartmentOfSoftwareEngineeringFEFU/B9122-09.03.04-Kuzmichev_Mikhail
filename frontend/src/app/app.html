@@ -1,0 +1,68 @@
+<div class="app-shell">
+  <div class="app-shell__glow app-shell__glow--left" aria-hidden="true"></div>
+  <div class="app-shell__glow app-shell__glow--right" aria-hidden="true"></div>
+
+  <header class="site-header">
+    <div class="site-header__inner">
+      <a class="brand" routerLink="/">
+        <span class="brand__eyebrow">Learning Analytics</span>
+        <span class="brand__title">Учебный кабинет</span>
+      </a>
+
+      <nav class="site-nav" aria-label="Основная навигация">
+        <a
+          class="site-nav__link"
+          routerLink="/"
+          [routerLinkActiveOptions]="{ exact: true }"
+          routerLinkActive="site-nav__link--active"
+        >
+          Главная
+        </a>
+
+        @if (authService.isAuthenticated()) {
+          <a class="site-nav__action" routerLink="/courses" routerLinkActive="site-nav__action--active">
+            Перейти к курсам
+          </a>
+          <a class="site-nav__action" routerLink="/analytics" routerLinkActive="site-nav__action--active">
+            Посмотреть аналитику
+          </a>
+          <a class="site-nav__action" routerLink="/recommendations" routerLinkActive="site-nav__action--active">
+            Открыть рекомендации
+          </a>
+          <a class="site-nav__action" routerLink="/attempts" routerLinkActive="site-nav__action--active">
+            Незавершённые попытки
+          </a>
+
+          <a class="profile-shortcut" routerLink="/profile" routerLinkActive="profile-shortcut--active">
+            <span class="profile-shortcut__avatar" aria-hidden="true">{{ profileInitials() }}</span>
+            <span class="profile-shortcut__text">{{ profileLabel() }}</span>
+          </a>
+        } @else {
+          <a class="site-nav__link" routerLink="/login" routerLinkActive="site-nav__link--active">
+            Вход
+          </a>
+          <a
+            class="site-nav__link site-nav__link--button"
+            routerLink="/register"
+            routerLinkActive="site-nav__link--active"
+          >
+            Регистрация
+          </a>
+        }
+      </nav>
+    </div>
+  </header>
+
+  <main class="site-main">
+    <div class="site-main__inner">
+      <router-outlet />
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="site-footer__inner">
+      <p>Платформа для учебной аналитики и персонального прогресса.</p>
+      <p>Angular frontend + FastAPI backend.</p>
+    </div>
+  </footer>
+</div>
